@@ -41,6 +41,20 @@ namespace Pilot
         void setupDescriptorSet();
     };
 
+    // NeilKleistGao Modified
+    class PImageBlockGlitchPass : public PRenderPassBase 
+    {
+    public:
+        void initialize(VkRenderPass render_pass, VkImageView input_attachment);
+        void draw();
+
+        void updateAfterFramebufferRecreate(VkImageView input_attachment);
+    private:
+        void setupDescriptorSetLayout();
+        void setupPipelines();
+        void setupDescriptorSet();
+    };
+
     class PUIPass : public PRenderPassBase
     {
     public:
@@ -85,6 +99,7 @@ namespace Pilot
         _main_camera_pass_attachment_count        = 7,
     };
 
+    // NeilKleistGao Modified
     enum
     {
         _main_camera_subpass_basepass = 0,
@@ -92,6 +107,7 @@ namespace Pilot
         _main_camera_subpass_forward_lighting,
         _main_camera_subpass_tone_mapping,
         _main_camera_subpass_color_grading,
+        _main_camera_subpass_image_block_glitch,
         _main_camera_subpass_ui,
         _main_camera_subpass_combine_ui,
         _main_camera_subpass_count
@@ -136,8 +152,10 @@ namespace Pilot
 
         void initialize();
 
+        // NeilKleistGao Modified
         void draw(PColorGradingPass& color_grading_pass,
                   PToneMappingPass&  tone_mapping_pass,
+                  PImageBlockGlitchPass& image_block_glitch_pass,
                   PUIPass&           ui_pass,
                   PCombineUIPass&    combine_ui_pass,
                   uint32_t           current_swapchain_image_index,
