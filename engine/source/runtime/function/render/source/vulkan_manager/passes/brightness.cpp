@@ -12,8 +12,6 @@ namespace Pilot
 {
     void PBrightnessPass::initialize(VkRenderPass render_pass, VkImageView input_attachment) 
     {
-        auto now                 = std::chrono::system_clock::now().time_since_epoch();
-        m_starttime              = now.count();
         _framebuffer.render_pass = render_pass;
         setupDescriptorSetLayout();
         setupPipelines();

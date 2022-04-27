@@ -53,8 +53,6 @@ namespace Pilot
         void setupDescriptorSetLayout();
         void setupPipelines();
         void setupDescriptorSet();
-
-        long long m_starttime;
     };
 
     class PUIPass : public PRenderPassBase
