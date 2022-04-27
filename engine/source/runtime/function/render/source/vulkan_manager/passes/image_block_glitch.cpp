@@ -3,6 +3,9 @@
 #include "runtime/function/render/include/render/vulkan_manager/vulkan_misc.h"
 #include "runtime/function/render/include/render/vulkan_manager/vulkan_passes.h"
 #include "runtime/function/render/include/render/vulkan_manager/vulkan_util.h"
+#include "runtime/function/render/include/render/vulkan_manager/vulkan_global_resource.h"
+
+#include <chrono>
 
 #include <post_process_vert.h>
 #include <image_block_glitch_frag.h>
@@ -40,6 +43,11 @@ namespace Pilot
                                                      0,
                                                      NULL);
 
+        auto  now               = std::chrono::system_clock::now().time_since_epoch();
+        float push_constants[3] = {now.count(),
+                                   m_p_global_render_resource->_glitch_constant.speed,
+                                   m_p_global_render_resource->_glitch_constant.size};
+        vkCmdPushConstants(m_command_info._current_command_buffer, _render_pipelines[0].layout, VK_SHADER_STAGE_FRAGMENT_BIT, 0, sizeof(push_constants), push_constants);
         vkCmdDraw(m_command_info._current_command_buffer, 3, 1, 0, 0);
 
         if (m_render_config._enable_debug_untils_label)
@@ -109,6 +117,11 @@ namespace Pilot
 
     void PImageBlockGlitchPass::setupPipelines() 
     {
+        VkPushConstantRange range;
+        range.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
+        range.offset     = 0;
+        range.size       = sizeof(float) * 3;
+
         _render_pipelines.resize(1);
 
         VkDescriptorSetLayout      descriptorset_layouts[1] = {_descriptor_infos[0].layout};
@@ -116,6 +129,8 @@ namespace Pilot
         pipeline_layout_create_info.sType          = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
         pipeline_layout_create_info.setLayoutCount = 1;
         pipeline_layout_create_info.pSetLayouts    = descriptorset_layouts;
+        pipeline_layout_create_info.pushConstantRangeCount = 1;
+        pipeline_layout_create_info.pPushConstantRanges    = &range;
 
         if (vkCreatePipelineLayout(
                 m_p_vulkan_context->_device, &pipeline_layout_create_info, nullptr, &_render_pipelines[0].layout) !=
