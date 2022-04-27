@@ -84,11 +84,9 @@ namespace Pilot
     };
 
     // NeilKleistGao Modified
-    struct PAnalogGlitchConstant
+    struct PBrightnessConstant
     {
-        float speed;
-        float fading;
-        float jitter_threshold;
+        float brightness;
     };
 
     class PGlobalRenderResource
@@ -97,7 +95,7 @@ namespace Pilot
         PIBLResource          _ibl_resource;
         PColorGradingResource _color_grading_resource;
         PStorageBuffer        _storage_buffer;
-        PAnalogGlitchConstant _glitch_constant;
+        PBrightnessConstant   _brightness_constant;
 
         void                      initialize(PVulkanContext& context, int frames_in_flight = 3);
         PIBLResourceData          getIBLTextureData(Scene* scene, class PilotRenderer* renderer);

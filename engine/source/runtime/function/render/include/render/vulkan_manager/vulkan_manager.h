@@ -120,7 +120,7 @@ namespace Pilot
         PColorGradingPass           m_color_grading_pass;
         PToneMappingPass            m_tone_mapping_pass;
         // NeilKleistGao Modified
-        PAnalogGlitchPass       m_analog_glitch_pass;
+        PBrightnessPass       m_brightness_pass;
         PUIPass                     m_ui_pass;
         PCombineUIPass              m_combine_ui_pass;
         PPickPass                   m_mouse_pick_pass;

@@ -153,9 +153,7 @@ namespace Pilot
         std::shared_ptr<PCamera> m_camera;
 
         // NeilKleistGao Modified
-        float m_analog_glitch_speed {0};
-        float m_analog_glitch_fading {0};
-        float m_analog_glitch_jitter_threshold {0};
+        float m_brightness {0};
 
         std::vector<std::shared_ptr<PParticleBillbord>> m_particlebillboards;
 

@@ -34,7 +34,7 @@ bool Pilot::PVulkanManager::initializeRenderPass()
     m_color_grading_pass.initialize(m_main_camera_pass.getRenderPass(), m_main_camera_pass.getFramebufferImageViews()[_main_camera_pass_backup_buffer_even]);
 
     // NeilKleistGao Modified
-    m_analog_glitch_pass.initialize(
+    m_brightness_pass.initialize(
       m_main_camera_pass.getRenderPass(),
       m_main_camera_pass.getFramebufferImageViews()[_main_camera_pass_backup_buffer_odd]);
 
