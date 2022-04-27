@@ -8,11 +8,11 @@
 #include <chrono>
 
 #include <post_process_vert.h>
-#include <image_block_glitch_frag.h>
+#include <analog_glitch_frag.h>
 
 namespace Pilot
 {
-    void PImageBlockGlitchPass::initialize(VkRenderPass render_pass, VkImageView input_attachment) 
+    void PAnalogGlitchPass::initialize(VkRenderPass render_pass, VkImageView input_attachment) 
     {
         _framebuffer.render_pass = render_pass;
         setupDescriptorSetLayout();
@@ -21,7 +21,7 @@ namespace Pilot
         updateAfterFramebufferRecreate(input_attachment);
     }
 
-    void PImageBlockGlitchPass::draw() 
+    void PAnalogGlitchPass::draw() 
     {
         if (m_render_config._enable_debug_untils_label)
         {
@@ -44,9 +44,10 @@ namespace Pilot
                                                      NULL);
 
         auto  now               = std::chrono::system_clock::now().time_since_epoch();
-        float push_constants[3] = {now.count(),
+        float push_constants[4] = {now.count(),
                                    m_p_global_render_resource->_glitch_constant.speed,
-                                   m_p_global_render_resource->_glitch_constant.size};
+                                   m_p_global_render_resource->_glitch_constant.fading,
+                                   m_p_global_render_resource->_glitch_constant.jitter_threshold};
         vkCmdPushConstants(m_command_info._current_command_buffer, _render_pipelines[0].layout, VK_SHADER_STAGE_FRAGMENT_BIT, 0, sizeof(push_constants), push_constants);
         vkCmdDraw(m_command_info._current_command_buffer, 3, 1, 0, 0);
 
@@ -56,7 +57,7 @@ namespace Pilot
         }
     }
 
-    void PImageBlockGlitchPass::updateAfterFramebufferRecreate(VkImageView input_attachment) 
+    void PAnalogGlitchPass::updateAfterFramebufferRecreate(VkImageView input_attachment) 
     {
         VkDescriptorImageInfo post_process_per_frame_input_attachment_info = {};
         post_process_per_frame_input_attachment_info.sampler =
@@ -85,7 +86,7 @@ namespace Pilot
                                NULL);
     }
 
-    void PImageBlockGlitchPass::setupDescriptorSetLayout() 
+    void PAnalogGlitchPass::setupDescriptorSetLayout() 
     {
         _descriptor_infos.resize(1);
 
@@ -115,12 +116,12 @@ namespace Pilot
         }
     }
 
-    void PImageBlockGlitchPass::setupPipelines() 
+    void PAnalogGlitchPass::setupPipelines() 
     {
         VkPushConstantRange range;
         range.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
         range.offset     = 0;
-        range.size       = sizeof(float) * 3;
+        range.size       = sizeof(float) * 4;
 
         _render_pipelines.resize(1);
 
@@ -142,7 +143,7 @@ namespace Pilot
         VkShaderModule vert_shader_module =
             PVulkanUtil::createShaderModule(m_p_vulkan_context->_device, POST_PROCESS_VERT);
         VkShaderModule frag_shader_module =
-            PVulkanUtil::createShaderModule(m_p_vulkan_context->_device, IMAGE_BLOCK_GLITCH_FRAG);
+            PVulkanUtil::createShaderModule(m_p_vulkan_context->_device, ANALOG_GLITCH_FRAG);
 
         VkPipelineShaderStageCreateInfo vert_pipeline_shader_stage_create_info {};
         vert_pipeline_shader_stage_create_info.sType  = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
@@ -246,7 +247,7 @@ namespace Pilot
         pipelineInfo.pDepthStencilState  = &depth_stencil_create_info;
         pipelineInfo.layout              = _render_pipelines[0].layout;
         pipelineInfo.renderPass          = _framebuffer.render_pass;
-        pipelineInfo.subpass             = _main_camera_subpass_image_block_glitch;
+        pipelineInfo.subpass             = _main_camera_subpass_analog_glitch;
         pipelineInfo.basePipelineHandle  = VK_NULL_HANDLE;
         pipelineInfo.pDynamicState       = &dynamic_state_create_info;
 
@@ -264,7 +265,7 @@ namespace Pilot
         vkDestroyShaderModule(m_p_vulkan_context->_device, frag_shader_module, nullptr);
     }
 
-    void PImageBlockGlitchPass::setupDescriptorSet() 
+    void PAnalogGlitchPass::setupDescriptorSet() 
     {
         VkDescriptorSetAllocateInfo post_process_global_descriptor_set_alloc_info;
         post_process_global_descriptor_set_alloc_info.sType          = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;

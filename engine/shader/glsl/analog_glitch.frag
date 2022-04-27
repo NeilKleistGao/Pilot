@@ -8,13 +8,18 @@ layout(input_attachment_index = 0, set = 0, binding = 0) uniform highp subpassIn
 layout(push_constant) uniform Param {
     highp float time;
     highp float speed;
-    highp float size;
+    highp float fading;
+    highp float jitter_threshold;
 } param;
 
 layout(location = 0) out highp vec4 out_color;
 
-void main()
-{
+highp float randomNoise(highp vec2 seed) {
+	return fract(sin(dot(seed.xy, vec2(12.9898, 78.233))) * 43758.5453);
+}
+
+void main() {
     highp vec4 color = subpassLoad(in_color).rgba;
+
     out_color = color;
 }

@@ -63,7 +63,8 @@ namespace Pilot
         DirectionalLight m_directional_light;
 
         // NeilKleistGao Modified
-        float m_image_block_glitch_speed;
-        float m_image_block_glitch_size;
+        float m_analog_glitch_speed;
+        float m_analog_glitch_fading;
+        float m_analog_glitch_jitter_threshold;
     };
 } // namespace Pilot

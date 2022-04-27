@@ -274,25 +274,25 @@ namespace Pilot
         color_grading_pass.pPreserveAttachments    = NULL;
 
         // NeilKleistGao Modified
-        VkAttachmentReference image_block_glitch_pass_input_attachment_reference {};
-        image_block_glitch_pass_input_attachment_reference.attachment =
+        VkAttachmentReference analog_glitch_pass_input_attachment_reference {};
+        analog_glitch_pass_input_attachment_reference.attachment =
             &backup_odd_color_attachment_description - attachments;
-        image_block_glitch_pass_input_attachment_reference.layout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+        analog_glitch_pass_input_attachment_reference.layout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 
-        VkAttachmentReference image_block_glitch_pass_color_attachment_reference {};
-        image_block_glitch_pass_color_attachment_reference.attachment =
+        VkAttachmentReference analog_glitch_pass_color_attachment_reference {};
+        analog_glitch_pass_color_attachment_reference.attachment =
             &backup_even_color_attachment_description - attachments;
-        image_block_glitch_pass_color_attachment_reference.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+        analog_glitch_pass_color_attachment_reference.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
 
-        VkSubpassDescription& image_block_glitch_pass = subpasses[_main_camera_subpass_image_block_glitch];
-        image_block_glitch_pass.pipelineBindPoint     = VK_PIPELINE_BIND_POINT_GRAPHICS;
-        image_block_glitch_pass.inputAttachmentCount  = 1;
-        image_block_glitch_pass.pInputAttachments       = &image_block_glitch_pass_input_attachment_reference;
-        image_block_glitch_pass.colorAttachmentCount  = 1;
-        image_block_glitch_pass.pColorAttachments       = &image_block_glitch_pass_color_attachment_reference;
-        image_block_glitch_pass.pDepthStencilAttachment = NULL;
-        image_block_glitch_pass.preserveAttachmentCount = 0;
-        image_block_glitch_pass.pPreserveAttachments    = NULL;
+        VkSubpassDescription& analog_glitch_pass = subpasses[_main_camera_subpass_analog_glitch];
+        analog_glitch_pass.pipelineBindPoint     = VK_PIPELINE_BIND_POINT_GRAPHICS;
+        analog_glitch_pass.inputAttachmentCount  = 1;
+        analog_glitch_pass.pInputAttachments       = &analog_glitch_pass_input_attachment_reference;
+        analog_glitch_pass.colorAttachmentCount  = 1;
+        analog_glitch_pass.pColorAttachments       = &analog_glitch_pass_color_attachment_reference;
+        analog_glitch_pass.pDepthStencilAttachment = NULL;
+        analog_glitch_pass.preserveAttachmentCount = 0;
+        analog_glitch_pass.pPreserveAttachments    = NULL;
 
         VkAttachmentReference ui_pass_color_attachment_reference {};
         ui_pass_color_attachment_reference.attachment = &backup_odd_color_attachment_description - attachments;
@@ -385,18 +385,18 @@ namespace Pilot
         color_grading_pass_depend_on_tone_mapping_pass.dependencyFlags = VK_DEPENDENCY_BY_REGION_BIT;
 
         // NeilKleistGao Modified
-        VkSubpassDependency& image_block_glitch_pass_depend_on_color_grading_pass = dependencies[5];
-        image_block_glitch_pass_depend_on_color_grading_pass.srcSubpass           = _main_camera_subpass_color_grading;
-        image_block_glitch_pass_depend_on_color_grading_pass.dstSubpass           = _main_camera_subpass_image_block_glitch;
-        image_block_glitch_pass_depend_on_color_grading_pass.srcStageMask =
+        VkSubpassDependency& analog_glitch_pass_depend_on_color_grading_pass = dependencies[5];
+        analog_glitch_pass_depend_on_color_grading_pass.srcSubpass           = _main_camera_subpass_color_grading;
+        analog_glitch_pass_depend_on_color_grading_pass.dstSubpass           = _main_camera_subpass_analog_glitch;
+        analog_glitch_pass_depend_on_color_grading_pass.srcStageMask =
             VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
-        image_block_glitch_pass_depend_on_color_grading_pass.dstStageMask   = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
-        image_block_glitch_pass_depend_on_color_grading_pass.srcAccessMask  = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
-        image_block_glitch_pass_depend_on_color_grading_pass.dstAccessMask  = VK_ACCESS_SHADER_READ_BIT;
-        image_block_glitch_pass_depend_on_color_grading_pass.dependencyFlags = VK_DEPENDENCY_BY_REGION_BIT;
+        analog_glitch_pass_depend_on_color_grading_pass.dstStageMask   = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
+        analog_glitch_pass_depend_on_color_grading_pass.srcAccessMask  = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+        analog_glitch_pass_depend_on_color_grading_pass.dstAccessMask  = VK_ACCESS_SHADER_READ_BIT;
+        analog_glitch_pass_depend_on_color_grading_pass.dependencyFlags = VK_DEPENDENCY_BY_REGION_BIT;
 
         VkSubpassDependency& ui_pass_depend_on_color_grading_pass = dependencies[6];
-        ui_pass_depend_on_color_grading_pass.srcSubpass           = _main_camera_subpass_image_block_glitch;
+        ui_pass_depend_on_color_grading_pass.srcSubpass           = _main_camera_subpass_analog_glitch;
         ui_pass_depend_on_color_grading_pass.dstSubpass           = _main_camera_subpass_ui;
         ui_pass_depend_on_color_grading_pass.srcStageMask         = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
         ui_pass_depend_on_color_grading_pass.dstStageMask         = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
@@ -2099,7 +2099,7 @@ namespace Pilot
 
     void PMainCameraPass::draw(PColorGradingPass& color_grading_pass,
                                PToneMappingPass&  tone_mapping_pass,
-                               PImageBlockGlitchPass& image_block_glitch_pass,
+                               PAnalogGlitchPass& analog_glitch_pass,
                                PUIPass&           ui_pass,
                                PCombineUIPass&    combine_ui_pass,
                                uint32_t           current_swapchain_image_index,
@@ -2185,7 +2185,7 @@ namespace Pilot
         m_p_vulkan_context->_vkCmdNextSubpass(m_command_info._current_command_buffer, VK_SUBPASS_CONTENTS_INLINE);
 
         // NeilKleistGao Modified
-        image_block_glitch_pass.draw();
+        analog_glitch_pass.draw();
 
         m_p_vulkan_context->_vkCmdNextSubpass(m_command_info._current_command_buffer, VK_SUBPASS_CONTENTS_INLINE);
 
